@@ -10,7 +10,6 @@ import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import static org.testng.Assert.*;
 
 public class NuskinAssessmentTest {
 
