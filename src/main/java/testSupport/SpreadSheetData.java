@@ -1,5 +1,6 @@
 package testSupport;
 
+import org.apache.poi.ss.formula.functions.Column;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -16,9 +17,9 @@ import java.util.Iterator;
  * Created by heidy.cespedes on 5/25/2016.
  */
 public class SpreadSheetData {
-   private Object[][] data = null;
+   private Object[][] data = new Object[][]{new String[]{"", ""}};
 
-   public Object[][] getData(String excelFilePath) throws IOException {
+   public Object[][] getData(String excelFilePath, String parameter) throws IOException {
 
       FileInputStream inputStream = null;
       try {
@@ -44,17 +45,26 @@ public class SpreadSheetData {
 
          while (cellIterator.hasNext()) {
             Cell cell = cellIterator.next();
+            int colIndex = cell.getColumnIndex();
+            String cellValue = "";
 
             switch (cell.getCellType()) {
                case Cell.CELL_TYPE_STRING:
+                  cellValue = cell.getStringCellValue();
                   System.out.print(cell.getStringCellValue());
                   break;
-               case Cell.CELL_TYPE_BOOLEAN:
-                  System.out.print(cell.getBooleanCellValue());
-                  break;
                case Cell.CELL_TYPE_NUMERIC:
+                  cellValue = String.valueOf(cell.getNumericCellValue());
                   System.out.print(cell.getNumericCellValue());
                   break;
+            }
+
+            if (cellValue.equals(parameter)) {
+               nextRow = rowIterator.next();
+               cell = nextRow.getCell(colIndex);
+               cellValue = cell.getStringCellValue();
+               data [0][0] = parameter;
+               data [0][1] = cellValue;
             }
             System.out.print(" - ");
          }
@@ -64,6 +74,6 @@ public class SpreadSheetData {
       //workbook.close();
       inputStream.close();
 
-      return null;
+      return data;
    }
 }
