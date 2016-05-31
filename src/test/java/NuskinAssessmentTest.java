@@ -51,7 +51,7 @@ public class NuskinAssessmentTest {
       // Define what parameters are needed based on what test step is run
       if (method.getName().equals("accessTestAssessment")) {
          parameter = "Language";
-      } else if (method.getName().equals("personalInfo")) {
+      } else if (method.getName().equals("c_personalInfo")) {
          parameter = "Personal Info (First Name; Age; Female/Male)";
       } else if (method.getName().equals("ethnicity")) {
          parameter = "Ethnicity";
@@ -130,7 +130,7 @@ public class NuskinAssessmentTest {
    }
 
    @Test
-   public void btermsOfUse() {
+   public void b_termsOfUse() {
       testStatus = true;
       WebElement element;
       // Check that the string is not English when testing other languages....
@@ -153,7 +153,7 @@ public class NuskinAssessmentTest {
    }
 
    @Test(dataProvider = "GetExcelData")
-   public void personalInfo(String parameter, String info) {
+   public void c_personalInfo(String parameter, String info) {
       testStatus = true;
       String[] parts = info.split(";");
       WebElement name = findElement("//input[@id='name-text']");
