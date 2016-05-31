@@ -51,11 +51,11 @@ public class SpreadSheetData {
             switch (cell.getCellType()) {
                case Cell.CELL_TYPE_STRING:
                   cellValue = cell.getStringCellValue();
-                  System.out.print(cell.getStringCellValue());
+                  //System.out.print(cell.getStringCellValue());  // This is only for debugging. I will remove this later
                   break;
                case Cell.CELL_TYPE_NUMERIC:
                   cellValue = String.valueOf(cell.getNumericCellValue());
-                  System.out.print(cell.getNumericCellValue());
+                  //System.out.print(cell.getNumericCellValue()); // This is only for debugging. I will remove this later
                   break;
             }
 
