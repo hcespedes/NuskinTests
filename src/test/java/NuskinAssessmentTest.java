@@ -56,7 +56,7 @@ public class NuskinAssessmentTest {
          parameter = "Terms Of Use Text";
       } else if (method.getName().equals("c_personalInfo")) {
          parameter = "Personal Info (First Name; Age; Female/Male)";
-      } else if (method.getName().equals("ethnicity")) {
+      } else if (method.getName().equals("d_ethnicity")) {
          parameter = "Ethnicity";
       } else if (method.getName().equals("location")) {
          parameter = "Location";
@@ -213,7 +213,85 @@ public class NuskinAssessmentTest {
       }
 
       // Go to next page
-      nextButton.click();
+      if (testStatus) {
+         testStatus = pageSupport.clickOn(driver, nextButton, "Next Button", "NextButton");
+      } else {
+         pageSupport.clickOn(driver, nextButton, "Next Button", "NextButton");
+      }
+   }
+
+   @Test(dataProvider = "GetExcelData")
+   public void d_ethnicity(String parameter, String ethnicity) {
+      testStatus = true;
+      WebElement element;
+      WebElement nextButton;
+
+      switch (ethnicity) {
+         case "African":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[1]");
+            break;
+         case "Caucasian (European)":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[2]");
+            break;
+         case "Chinese":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[3]");
+            break;
+         case "Filipino":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[4]");
+            break;
+         case "Hispanic":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[5]");
+            break;
+         case "Indian":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[6]");
+            break;
+         case "Japanese":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[7]");
+            break;
+         case "Javanese":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[8]");
+            break;
+         case "Korean":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[9]");
+            break;
+         case "Malaysian":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[10]");
+            break;
+         case "Mediterranean":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[11]");
+            break;
+         case "Middle Eastern":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[12]");
+            break;
+         case "Native American":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[13]");
+            break;
+         case "South Pacific Islander":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[14]");
+            break;
+         case "Thai":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[15]");
+            break;
+         case "Vietnamese":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[16]");
+            break;
+         case "Other":
+            element = pageSupport.findElement(driver, "//ul[@class='button-list']//li[17]");
+            break;
+         default:
+            element = null;
+            break;
+      }
+
+      // Click on the correct element and click on arrow to continue
+      testStatus = pageSupport.clickOn(driver, element, "Ethnicity", "Ethnicity");
+      nextButton = pageSupport.findElement(driver, "//div[@class='footer']//button[@translate='next-btn-text']");
+      // Go to next page
+      if (testStatus) {
+         testStatus = pageSupport.clickOn(driver, nextButton, "Next Button", "NextButton");
+      } else {
+         pageSupport.clickOn(driver, nextButton, "Next Button", "NextButton");
+      }
    }
 
    @AfterMethod
