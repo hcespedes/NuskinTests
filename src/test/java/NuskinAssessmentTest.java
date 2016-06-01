@@ -1,5 +1,3 @@
-import com.gargoylesoftware.htmlunit.Page;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -48,54 +46,79 @@ public class NuskinAssessmentTest {
       Object [][] data;
       data = new Object[][]{new String[]{""}};
       String parameter = "";
+      String testName = method.getName();
 
       // Define what parameters are needed based on what test step is run
-      if (method.getName().equals("accessTestAssessment")) {
-         parameter = "Language";
-      } else if (method.getName().equals("b_termsOfUse")) {
-         parameter = "Terms Of Use Text";
-      } else if (method.getName().equals("c_personalInfo")) {
-         parameter = "Personal Info (First Name; Age; Female/Male)";
-      } else if (method.getName().equals("d_ethnicity")) {
-         parameter = "Ethnicity";
-      } else if (method.getName().equals("location")) {
-         parameter = "Location";
-      } else if (method.getName().equals("chemicalExposure")) {
-         parameter = "Chemical Exposure";
-      } else if (method.getName().equals("sunExposure")) {
-         parameter = "Sun Exposure (hrs)";
-      } else if (method.getName().equals("skinType")) {
-         parameter = "Skin Type";
-      } else if (method.getName().equals("skinIrritability")) {
-         parameter = "Skin Irritability";
-      } else if (method.getName().equals("reactionToAHAS")) {
-         parameter = "Reaction to AHAS";
-      } else if (method.getName().equals("ageSpots")) {
-         parameter = "Age Spots";
-      } else if (method.getName().equals("eyesLines&Wrinkles")) {
-         parameter = "Eyes Lines & Wrinkles";
-      } else if (method.getName().equals("mouthLines&Wrinkles")) {
-         parameter = "Mouth Lines & Wrinkles";
-      } else if (method.getName().equals("foreheadLines&Wrinkles")) {
-         parameter = "Forehead Lines & Wrinkles";
-      } else if (method.getName().equals("poreAppearance")) {
-         parameter = "Pore Appearance";
-      } else if (method.getName().equals("skinFirmness")) {
-         parameter = "Skin Firmness";
-      } else if (method.getName().equals("skinRadiance")) {
-         parameter = "Skin Radiance";
-      } else if (method.getName().equals("skinTexture")) {
-         parameter = "Skin Texture";
-      } else if (method.getName().equals("dayMoisturiserFragance")) {
-         parameter = "Day Moisturiser Fragance";
-      } else if (method.getName().equals("dayMoisturiserPreference")) {
-         parameter = "Day Moisturiser Preference";
-      } else if (method.getName().equals("nightMoisturiserFragance")) {
-         parameter = "Night Moisturiser Fragance";
-      } else if (method.getName().equals("nightMoisturiserPreference")) {
-         parameter = "Night Moisturiser Preference";
-      } else {
-         System.out.println("Parameter Type is not recognized");
+      switch (testName) {
+         case "accessTestAssessment":
+            parameter = "Language";
+            break;
+         case "b_termsOfUse":
+            parameter = "Terms Of Use Text";
+            break;
+         case "c_personalInfo":
+            parameter = "Personal Info (First Name; Age; Female/Male)";
+            break;
+         case "d_ethnicity":
+            parameter = "Ethnicity";
+            break;
+         case "e_location":
+            parameter = "Location";
+            break;
+         case "f_chemicalExposure":
+            parameter = "Chemical Exposure";
+            break;
+         case "g_sunExposure":
+            parameter = "Sun Exposure (hrs)";
+            break;
+         case "h_skinType":
+            parameter = "Skin Type";
+            break;
+         case "i_skinIrritability":
+            parameter = "Skin Irritability";
+            break;
+         case "j_reactionToAHAS":
+            parameter = "Reaction to AHAS";
+            break;
+         case "k_ageSpots":
+            parameter = "Age Spots";
+            break;
+         case "l_eyesLines&Wrinkles":
+            parameter = "Eyes Lines & Wrinkles";
+            break;
+         case "m_mouthLines&Wrinkles":
+            parameter = "Mouth Lines & Wrinkles";
+            break;
+         case "n_foreheadLines&Wrinkles":
+            parameter = "Forehead Lines & Wrinkles";
+            break;
+         case "o_poreAppearance":
+            parameter = "Pore Appearance";
+            break;
+         case "p_skinFirmness":
+            parameter = "Skin Firmness";
+            break;
+         case "q_skinRadiance":
+            parameter = "Skin Radiance";
+            break;
+         case "r_skinTexture":
+            parameter = "Skin Texture";
+            break;
+         case "s_dayMoisturiserFragance":
+            parameter = "Day Moisturiser Fragance";
+            break;
+         case "t_dayMoisturiserPreference":
+            parameter = "Day Moisturiser Preference";
+            break;
+         case "u_nightMoisturiserFragance":
+            parameter = "Night Moisturiser Fragance";
+            break;
+         case "v_nightMoisturiserPreference":
+            parameter = "Night Moisturiser Preference";
+            break;
+         default:
+            System.out.println("Parameter Type is not recognized");
+            break;
       }
 
       // Retrieve data from spreadSheet depending on what parameter is specified
@@ -285,6 +308,23 @@ public class NuskinAssessmentTest {
 
       // Click on the correct element and click on arrow to continue
       testStatus = pageSupport.clickOn(driver, element, "Ethnicity", "Ethnicity");
+      nextButton = pageSupport.findElement(driver, "//div[@class='footer']//button[@translate='next-btn-text']");
+      // Go to next page
+      if (testStatus) {
+         testStatus = pageSupport.clickOn(driver, nextButton, "Next Button", "NextButton");
+      } else {
+         pageSupport.clickOn(driver, nextButton, "Next Button", "NextButton");
+      }
+   }
+
+   @Test(dataProvider = "GetExcelData")
+   public void e_location(String parameter, String location) {
+      testStatus = true;
+      WebElement element;
+      WebElement nextButton;
+
+      element = pageSupport.findElement(driver, "//input[@id='locationText']");
+      testStatus = pageSupport.fillOut(driver, element, location, "Location", "Location");
       nextButton = pageSupport.findElement(driver, "//div[@class='footer']//button[@translate='next-btn-text']");
       // Go to next page
       if (testStatus) {
