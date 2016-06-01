@@ -1,3 +1,4 @@
+import com.gargoylesoftware.htmlunit.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -7,20 +8,20 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 import testSupport.CaptureScreenShot;
+import testSupport.PageSupport;
 import testSupport.SpreadSheetData;
 
-import javax.xml.crypto.Data;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-
 public class NuskinAssessmentTest {
 
    // Declare the browser
    WebDriver driver;
+   PageSupport pageSupport = new PageSupport();
    private Properties props = new Properties();
    private String excelFilePath;
    private Boolean testStatus;
@@ -30,7 +31,7 @@ public class NuskinAssessmentTest {
       // Start the browser (Firefox in this case)
       driver = new FirefoxDriver();
       // Adds implicit timeouts to the driver
-      //driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+      driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
       // Get the excel file name which contains the parameters
       try {
          props.load(new FileInputStream("c://Users/heidy.cespedes/IdeaProjects/NuskinTests/src/main/resources/parameters.properties"));
@@ -51,6 +52,8 @@ public class NuskinAssessmentTest {
       // Define what parameters are needed based on what test step is run
       if (method.getName().equals("accessTestAssessment")) {
          parameter = "Language";
+      } else if (method.getName().equals("b_termsOfUse")) {
+         parameter = "Terms Of Use Text";
       } else if (method.getName().equals("c_personalInfo")) {
          parameter = "Personal Info (First Name; Age; Female/Male)";
       } else if (method.getName().equals("ethnicity")) {
@@ -124,57 +127,94 @@ public class NuskinAssessmentTest {
       }
       driver.manage().window().maximize();
       System.out.println("The title of the page is: " + title);
-      WebElement assessmentLink = driver.findElement(By.xpath("//div[@class='app-page']//ul//li[1]//h2[@translate='home-new-assessment']"));
+      WebElement assessmentLink = pageSupport.findElement(driver, "//div[@class='app-page']//ul//li[1]//h2[@translate='home-new-assessment']");
 
-      testStatus = clickOn(assessmentLink, "Assessment Link");
+      testStatus = pageSupport.clickOn(driver, assessmentLink, "Assessment Link", "AssessmentLink");
    }
 
-   @Test
-   public void b_termsOfUse() {
+   @Test(dataProvider = "GetExcelData")
+   public void b_termsOfUse(String parameter, String englishText) {
       testStatus = true;
+      boolean textTestStatus = true;
       WebElement element;
+      String currentUrl = driver.getCurrentUrl();
+      String line;
+
       // Check that the string is not English when testing other languages....
-      // Code goes here .....
+      if (currentUrl.contains("cs_CZ") || currentUrl.contains("da_DK")) {
+         line = pageSupport.findElement(driver, "//div[@class='popup-scroll-text full ng-binding']").getText();
+         line = line.replace("\n"," ");
+         englishText = englishText.replace("\n", " ");
+         if (line.equals(englishText)) {
+            System.out.println("The Terms of Use Agreement is in English");
+            CaptureScreenShot.takeScreenShot(driver, "TermsOfUseLanguage");
+            textTestStatus = false;
+         }
+      }
 
-      // Agree with Terms of Use:
+      // Agree with Terms of Use once the terms of use language has been verified:
+
       // Get the element for the checkbox
-      element = findElement("//p[@class='checkbox']//label[@translate='terms-conditions-agree']");
+      element = pageSupport.findElement(driver, "//p[@class='checkbox']//label[@translate='terms-conditions-agree']");
       // Click the checkbox
-      testStatus = clickOn(element, "Checkbox");
+      testStatus = pageSupport.clickOn(driver, element, "Checkbox", "Checkbox");
       // Get the element for the continue button
-      element = findElement("//div[@class='popup']//div//button[@translate='continue-btn-text']");
+      element = pageSupport.findElement(driver, "//div[@class='popup']//div//button[@translate='continue-btn-text']");
       // Click on the continue button
-      testStatus = clickOn(element, "Continue Button");
+      if (testStatus) {
+         testStatus = pageSupport.clickOn(driver, element, "Continue Button", "ContinueButton");
+      } else {
+         pageSupport.clickOn(driver, element, "Continue Button", "ContinueButton");
+      }
       // Get the next Continue button
-      element = findElement("//div[@class='footer start-page start']//button[@translate='continue-btn-text']");
+      element = pageSupport.findElement(driver, "//div[@class='footer start-page start']//button[@translate='continue-btn-text']");
       // Click on the continue button
-      testStatus = clickOn(element, "Continue Button");
-
+      if (testStatus) {
+         testStatus = pageSupport.clickOn(driver, element, "Continue Button", "ContinueButton2");
+      } else {
+         pageSupport.clickOn(driver, element, "Continue Button", "ContinueButton2");
+      }
+      // Make sure the final test status is correct
+      if (testStatus && !textTestStatus) {
+         testStatus = textTestStatus;
+      }
    }
 
    @Test(dataProvider = "GetExcelData")
    public void c_personalInfo(String parameter, String info) {
       testStatus = true;
       String[] parts = info.split(";");
-      WebElement name = findElement("//input[@id='name-text']");
-      WebElement age = findElement("//input[@id='age-text']");
-      WebElement female = findElement("//button[@translate='you-details-female']");
-      WebElement male = findElement("//button[@translate='you-details-male']");
-      WebElement nextButton = findElement("//button[@translate='next-btn-text']");
+      WebElement name = pageSupport.findElement(driver, "//input[@id='name-text']");
+      WebElement age = pageSupport.findElement(driver, "//input[@id='age-text']");
+      WebElement female = pageSupport.findElement(driver, "//button[@translate='you-details-female']");
+      WebElement male = pageSupport.findElement(driver, "//button[@translate='you-details-male']");
+      WebElement nextButton = pageSupport.findElement(driver, "//button[@translate='next-btn-text']");
 
       // Fill out form
-      testStatus = fillOut(name, parts[0], "Name element");
-      testStatus = fillOut(age, parts[1], "Age element");
-      if (parts[2].equals("Female")) {
-         testStatus = clickOn(female, "Female button");
+      testStatus = pageSupport.fillOut(driver, name, parts[0], "Name element", "Name");
+      // If the testStatus has changed to "failed" we want to keep that result for the final report
+      if (testStatus) {
+         testStatus = pageSupport.fillOut(driver, age, parts[1], "Age element", "Age");
       } else {
-         testStatus = clickOn(male, "Male button");
+         pageSupport.fillOut(driver, age, parts[1], "Age element", "Age");
       }
+      if (parts[2].equals("Female")) {
+         if (testStatus) {
+            testStatus = pageSupport.clickOn(driver, female, "Female button", "Female");
+         } else {
+            pageSupport.clickOn(driver, female, "Female button", "Female");
+         }
+      } else {
+         if (testStatus) {
+            testStatus = pageSupport.clickOn(driver, male, "Male button", "Male");
+         } else {
+            pageSupport.clickOn(driver, male, "Male button", "Male");
+         }
+      }
+
       // Go to next page
       nextButton.click();
-
    }
-
 
    @AfterMethod
    public void tearDown(ITestResult result, ITestContext testContext) {
@@ -182,11 +222,16 @@ public class NuskinAssessmentTest {
       if (!testStatus) {
          result.setStatus(2);
       }
-      System.out.println("Test status is " + result.getStatus());
-      System.out.println("Test name is " + result.getName());
-
+      // Takes screenshot if test failed
       if (result.FAILURE == result.getStatus()) {
-         CaptureScreenShot.takeScreenShot(driver, testContext.getName());
+         CaptureScreenShot.takeScreenShot(driver, result.getName()); //To do....Add date to differentiate names
+      }
+
+      System.out.println("Test name is " + result.getName());
+      if (result.getStatus() == 1) {
+         System.out.println("Test has passed");
+      } else if (result.getStatus() == 2){
+         System.out.println("Test has failed");
       }
    }
 
@@ -194,39 +239,6 @@ public class NuskinAssessmentTest {
    public void closeSelenium() {
       // Shutdown the browser
       driver.close();
-   }
-
-   public boolean clickOn(WebElement currentElement, String elementName) {
-      if ( currentElement.isDisplayed()) {
-         currentElement.click();
-         return true;
-      } else {
-         System.out.println("The " + elementName + " is not available");
-         return false;
-      }
-   }
-
-   public boolean fillOut(WebElement currentElement, String data, String elementName) {
-      if ( currentElement.isDisplayed()) {
-         currentElement.sendKeys(data);
-         return true;
-      } else {
-         System.out.println("The " + elementName + " is not available");
-         return false;
-      }
-   }
-
-   public WebElement findElement(String xpath) {
-      int counter = 0;
-      WebElement element = null;
-      while (element == null) {
-         element = driver.findElement(By.xpath(xpath));
-         counter++;
-         if (counter == 20) {
-            break;
-         }
-      }
-      return element;
    }
 
 }
