@@ -1,6 +1,9 @@
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -14,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class NuskinAssessmentTest {
 
@@ -134,7 +138,6 @@ public class NuskinAssessmentTest {
    @Test(dataProvider = "GetExcelData")
    public void accessTestAssessment(String parameter, String language) {
       String title = "";
-      testStatus = true;
       if (language.equals("English")) {
          driver.get("https://www.nuskin.com/content/nuskin/en_BE/ageloc-me-assessment.html#/home");
          title = driver.getTitle();
@@ -157,7 +160,6 @@ public class NuskinAssessmentTest {
 
    @Test(dataProvider = "GetExcelData")
    public void b_termsOfUse(String parameter, String englishText) {
-      testStatus = true;
       boolean textTestStatus = true;
       WebElement element;
       String currentUrl = driver.getCurrentUrl();
@@ -205,7 +207,6 @@ public class NuskinAssessmentTest {
 
    @Test(dataProvider = "GetExcelData")
    public void c_personalInfo(String parameter, String info) {
-      testStatus = true;
       String[] parts = info.split(";");
       WebElement name = pageSupport.findElement(driver, "//input[@id='name-text']");
       WebElement age = pageSupport.findElement(driver, "//input[@id='age-text']");
@@ -245,7 +246,6 @@ public class NuskinAssessmentTest {
 
    @Test(dataProvider = "GetExcelData")
    public void d_ethnicity(String parameter, String ethnicity) {
-      testStatus = true;
       WebElement element;
       WebElement nextButton;
 
@@ -319,7 +319,6 @@ public class NuskinAssessmentTest {
 
    @Test(dataProvider = "GetExcelData")
    public void e_location(String parameter, String location) {
-      testStatus = true;
       WebElement element;
       WebElement nextButton;
 
@@ -336,7 +335,24 @@ public class NuskinAssessmentTest {
 
    @Test(dataProvider = "GetExcelData")
    public void f_chemicalExposure(String parameter, String chemicalExposure) {
+      RemoteWebDriver remoteDriver = new FirefoxDriver();
+      remoteDriver = (RemoteWebDriver)driver;
+      WebElement knob = driver.findElement(By.xpath("//div[@class='portal']//div[@class='slide']//canvas"));
+      WebElement slider = driver.findElement(By.xpath("//div[@class='portal']//div[@class='slide']//input[@style]"));
+      Actions move = new Actions(driver);
+      System.out.println("The size of the slider is " + slider.getSize());
+      remoteDriver.executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);",
+            slider, "style", "display: ; width: 55px; visibility: visible;");
 
+      slider.sendKeys("\b");
+      slider.sendKeys("30");
+      slider.sendKeys(Keys.RETURN);
+      knob.click();
+   }
+
+   @BeforeMethod
+   public void setUpNewTest() {
+      testStatus = true;
    }
 
    @AfterMethod
