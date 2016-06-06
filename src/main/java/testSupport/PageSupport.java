@@ -1,6 +1,7 @@
 package testSupport;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -35,6 +36,7 @@ public class PageSupport {
       // Fill out form once the element is present
       if (currentElement.isDisplayed()) {
          currentElement.sendKeys(data);
+         currentElement.sendKeys(Keys.RETURN);
          return true;
       } else {
          System.out.println("The " + elementName + " is not available");
