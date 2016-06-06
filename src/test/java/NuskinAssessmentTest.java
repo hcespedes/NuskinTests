@@ -334,6 +334,11 @@ public class NuskinAssessmentTest {
       }
    }
 
+   @Test(dataProvider = "GetExcelData")
+   public void f_chemicalExposure(String parameter, String chemicalExposure) {
+
+   }
+
    @AfterMethod
    public void tearDown(ITestResult result, ITestContext testContext) {
 
